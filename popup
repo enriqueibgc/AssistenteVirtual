@@ -1,0 +1,418 @@
+<div id="ctl00_ctl44_g_9dec2409_4f8b_4b3f_a099_8dbfcc2470d3">
+		<div class="ms-rte-embedcode ms-rte-embedwp">
+  <meta charset="UTF-8">
+  <title>Assistente Virtual IBGC</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    @keyframes slideIn {
+      from { right: -100px; opacity: 0; }
+      to { right: 32px; opacity: 1; }
+    }
+
+    #popup {
+      display: none;
+      width: 380px;
+      height: 550px;
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 9998;
+      border: none;
+      border-radius: 16px;
+      background-color: #ffffff;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
+
+    #openPopupIcon {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 9998;
+      border-radius: 50%;
+      border: 3px solid #1E47B3;
+      background: linear-gradient(135deg, #1E47B3, #3a5fcd);
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      animation: slideIn 1s ease-in-out;
+      box-shadow: 0 4px 20px rgba(30, 71, 179, 0.3);
+    }
+
+    #openPopupIcon:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+      box-shadow: 0 6px 25px rgba(30, 71, 179, 0.4);
+    }
+
+    .triangle, .message, .ChatCloseButton {
+      position: fixed;
+      opacity: 0;
+      transition-duration: 0.5s;
+    }
+
+    .triangle.open, .message.open, .ChatCloseButton.open {
+      opacity: 1;
+    }
+
+    .triangle {
+      bottom: 106px;
+      right: 140px;
+      width: 0;
+      height: 0;
+      border-left: 13px solid transparent;
+      border-right: 0.1px solid transparent;
+      border-top: 20px solid #1E47B3;
+      z-index: 9998;
+    }
+
+    .message {
+      background-color: #FFFFFF;
+      bottom: 125px;
+      right: 132px;
+      font-family: sans-serif;
+      font-size: 1rem;
+      text-align: center;
+      width: 280px;
+      height: 50px;
+      border: 2px solid #1E47B3;
+      border-radius: 10px;
+      z-index: 9998;
+    }
+
+    .ChatCloseButton {
+      background-color: #1E47B3;
+      bottom: 175px;
+      right: 132px;
+      width: 60px;
+      height: 18px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 11px;
+      z-index: 9998;
+    }
+
+    .ChatCloseButton:hover {
+      background-color: #7FFFD4;
+    }
+
+    #webchat {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+    .webchat__suggested-actions__stack {
+    max-height: 200px !important; /* Ajuste conforme necessário */
+    overflow-y: auto !important;
+    padding-right: 4px;
+    font-size: 14px;
+    }
+    .webchat__suggested-action {
+    cursor: pointer;
+    line-height: 18px;
+    }
+    #chatHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #1E47B3, #3a5fcd);
+      color: white;
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      border-bottom: none;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #chatHeader .bot-name {
+      font-size: 16px;
+      color: white;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #headerMinimizeBtn {
+      width: 24px;
+      height: 24px;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE5IDEzSDR2LTJoMTV2MnoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=') no-repeat center center;
+      background-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s ease-in-out;
+      opacity: 0.8;
+    }
+
+    #headerMinimizeBtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      opacity: 1;
+    }
+
+    #headerCloseBtn {
+      width: 24px;
+      height: 24px;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE4IDYuMDAxbC0xMiAxMkg2bDEyLTEySDE4eiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYuMDAxIDZsMTIgMTJINThMNiAxOEg2LjAwMXoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=') no-repeat center center;
+      background-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s ease-in-out;
+      opacity: 0.8;
+    }
+
+    #headerCloseBtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      opacity: 1;
+    }
+
+  </style>
+
+  <img id="openPopupIcon" src="/Style%20Library/Images/robot.png" alt="Abrir Assistente">
+  <div class="triangle"></div>
+  <div class="message">
+    <div style="color:#1E47B3;font-size:14px;padding:3px">
+      Oi, sou Assistente Virtual do IBGC!<br>Posso te ajudar?
+    </div>
+  </div>
+  <div class="ChatCloseButton"><div style="color:#fff;padding:4px 8px">Fechar X</div></div>
+
+  <div id="popup" style="display: none;">
+  <div id="chatHeader">
+    <div class="bot-name">Assistente Virtual IBGC</div>
+    <div class="chat-header-actions">
+      <button id="headerMinimizeBtn" aria-label="Minimizar chat" type="button"></button>
+    </div>
+  </div>
+  <div id="webchat" role="main"><div class="webchat__css-custom-properties webchat--css-scuju-15rcxoz"><div class="webchat--css-scuju-j7qwjs webchat--css-scuju-1egyv3b" role="complementary"><div aria-live="polite" aria-relevant="all" class="webchat__toaster webchat--css-scuju-1b39fog webchat--css-scuju-up31fo" role="log"><div class="webchat__toaster__list" id="webchat__toaster__list__75sno"></div></div><div aria-labelledby="webchat__keyboard-help__header--2xr8g" class="webchat__keyboard-help webchat--css-scuju-5tcct1" role="dialog"><div class="webchat__keyboard-help__border"><div class="webchat__keyboard-help__box"><div class="webchat__keyboard-help__scrollable"><button aria-label="Fechar" class="webchat__keyboard-help__close-button" type="button"><div class="webchat__keyboard-help__close-button-border"><svg class="webchat__keyboard-help__close-button-image" focusable="false" role="presentation" viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg"><path d="M2048 136l-888 888 888 888-136 136-888-888-888 888L0 1912l888-888L0 136 136 0l888 888L1912 0l136 136z"></path></svg></div></button><h2 class="webchat__keyboard-help__header" id="webchat__keyboard-help__header--2xr8g">Controles do teclado</h2><article class="webchat__keyboard-help__section"><header><h3 class="webchat__keyboard-help__sub-header">Janela de chat</h3></header><div class="webchat__keyboard-help__two-panes"><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--light" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="#C8C6C4" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="#323130" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="#C8C6C4" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="#C8C6C4" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="#323130" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="#323130" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="#323130" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="#323130" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 5.64645C116.524 5.45118 116.84 5.45118 117.036 5.64645L120.218 8.82843C120.413 9.02369 120.413 9.34027 120.218 9.53553C120.022 9.7308 119.706 9.7308 119.51 9.53553L117.182 7.20711V192.793L119.51 190.464C119.706 190.269 120.022 190.269 120.218 190.464C120.413 190.66 120.413 190.976 120.218 191.172L117.036 194.354C116.84 194.549 116.524 194.549 116.328 194.354L113.146 191.172C112.951 190.976 112.951 190.66 113.146 190.464C113.342 190.269 113.658 190.269 113.854 190.464L116.182 192.793V7.20711L113.854 9.53553C113.658 9.7308 113.342 9.7308 113.146 9.53553C112.951 9.34027 112.951 9.02369 113.146 8.82843L116.328 5.64645Z" fill="#323130" fill-rule="evenodd"></path></svg><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--dark" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="#484644" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="#F3F2F1" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="#484644" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="#484644" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="#F3F2F1" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="#F3F2F1" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="#F3F2F1" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="#F3F2F1" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 5.64645C116.524 5.45118 116.84 5.45118 117.036 5.64645L120.218 8.82843C120.413 9.02369 120.413 9.34027 120.218 9.53553C120.022 9.7308 119.706 9.7308 119.51 9.53553L117.182 7.20711V192.793L119.51 190.464C119.706 190.269 120.022 190.269 120.218 190.464C120.413 190.66 120.413 190.976 120.218 191.172L117.036 194.354C116.84 194.549 116.524 194.549 116.328 194.354L113.146 191.172C112.951 190.976 112.951 190.66 113.146 190.464C113.342 190.269 113.658 190.269 113.854 190.464L116.182 192.793V7.20711L113.854 9.53553C113.658 9.7308 113.342 9.7308 113.146 9.53553C112.951 9.34027 112.951 9.02369 113.146 8.82843L116.328 5.64645Z" fill="#F3F2F1" fill-rule="evenodd"></path></svg><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--high-contrast" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="white" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="white" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="white" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="white" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="white" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="white" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="white" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="white" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 5.64645C116.524 5.45118 116.84 5.45118 117.036 5.64645L120.218 8.82843C120.413 9.02369 120.413 9.34027 120.218 9.53553C120.022 9.7308 119.706 9.7308 119.51 9.53553L117.182 7.20711V192.793L119.51 190.464C119.706 190.269 120.022 190.269 120.218 190.464C120.413 190.66 120.413 190.976 120.218 191.172L117.036 194.354C116.84 194.549 116.524 194.549 116.328 194.354L113.146 191.172C112.951 190.976 112.951 190.66 113.146 190.464C113.342 190.269 113.658 190.269 113.854 190.464L116.182 192.793V7.20711L113.854 9.53553C113.658 9.7308 113.342 9.7308 113.146 9.53553C112.951 9.34027 112.951 9.02369 113.146 8.82843L116.328 5.64645Z" fill="white" fill-rule="evenodd"></path></svg><div class="webchat__keyboard-help__notes-pane"><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Mover entre itens na janela de chat</dt><dd class="webchat__keyboard-help__notes-text">Tecla Tab</dd><dd class="webchat__keyboard-help__notes-text">Tecla Shift + tab</dd></dl><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Realizar ação</dt><dd class="webchat__keyboard-help__notes-text">Tecla Enter</dd></dl></div></div></article><article class="webchat__keyboard-help__section"><header><h3 class="webchat__keyboard-help__header">Histórico de chat</h3></header><div class="webchat__keyboard-help__two-panes"><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--light" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="#C8C6C4" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="#323130" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="#323130" stroke-dasharray="2 2" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="#323130" stroke-dasharray="2 2" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="#C8C6C4" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="#C8C6C4" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="#C8C6C4" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="#C8C6C4" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 7.64645C116.524 7.45118 116.84 7.45118 117.036 7.64645L120.218 10.8284C120.413 11.0237 120.413 11.3403 120.218 11.5355C120.022 11.7308 119.706 11.7308 119.51 11.5355L117.182 9.20711V156.793L119.51 154.464C119.706 154.269 120.022 154.269 120.218 154.464C120.413 154.66 120.413 154.976 120.218 155.172L117.036 158.354C116.84 158.549 116.524 158.549 116.328 158.354L113.146 155.172C112.951 154.976 112.951 154.66 113.146 154.464C113.342 154.269 113.658 154.269 113.854 154.464L116.182 156.793V9.20711L113.854 11.5355C113.658 11.7308 113.342 11.7308 113.146 11.5355C112.951 11.3403 112.951 11.0237 113.146 10.8284L116.328 7.64645Z" fill="#323130" fill-rule="evenodd"></path></svg><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--dark" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="#484644" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="#F3F2F1" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="#F3F2F1" stroke-dasharray="2 2" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="#F3F2F1" stroke-dasharray="2 2" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="#484644" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="#484644" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="#484644" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="#484644" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 7.64645C116.524 7.45118 116.84 7.45118 117.036 7.64645L120.218 10.8284C120.413 11.0237 120.413 11.3403 120.218 11.5355C120.022 11.7308 119.706 11.7308 119.51 11.5355L117.182 9.20711V156.793L119.51 154.464C119.706 154.269 120.022 154.269 120.218 154.464C120.413 154.66 120.413 154.976 120.218 155.172L117.036 158.354C116.84 158.549 116.524 158.549 116.328 158.354L113.146 155.172C112.951 154.976 112.951 154.66 113.146 154.464C113.342 154.269 113.658 154.269 113.854 154.464L116.182 156.793V9.20711L113.854 11.5355C113.658 11.7308 113.342 11.7308 113.146 11.5355C112.951 11.3403 112.951 11.0237 113.146 10.8284L116.328 7.64645Z" fill="#F3F2F1" fill-rule="evenodd"></path></svg><svg class="webchat__keyboard-help__image webchat__keyboard-help__image--high-contrast" fill="none" focusable="false" height="200" role="presentation" viewBox="0 0 121 200" width="121" xmlns="http://www.w3.org/2000/svg"><rect height="199" stroke="white" width="109" x="0.5" y="0.5"></rect><rect height="156" stroke="white" width="102" x="3.5" y="4.5"></rect><rect height="42" stroke="white" stroke-dasharray="2 2" width="93" x="7.5" y="8.5"></rect><rect height="99" stroke="white" stroke-dasharray="2 2" width="93" x="7.5" y="55.5"></rect><rect height="13" stroke="white" width="102" x="3.5" y="182.5"></rect><rect height="13" stroke="white" width="32" x="3.5" y="165.5"></rect><rect height="13" stroke="white" width="32" x="38.5" y="165.5"></rect><rect height="13" stroke="white" width="32" x="73.5" y="165.5"></rect><path clip-rule="evenodd" d="M116.328 7.64645C116.524 7.45118 116.84 7.45118 117.036 7.64645L120.218 10.8284C120.413 11.0237 120.413 11.3403 120.218 11.5355C120.022 11.7308 119.706 11.7308 119.51 11.5355L117.182 9.20711V156.793L119.51 154.464C119.706 154.269 120.022 154.269 120.218 154.464C120.413 154.66 120.413 154.976 120.218 155.172L117.036 158.354C116.84 158.549 116.524 158.549 116.328 158.354L113.146 155.172C112.951 154.976 112.951 154.66 113.146 154.464C113.342 154.269 113.658 154.269 113.854 154.464L116.182 156.793V9.20711L113.854 11.5355C113.658 11.7308 113.342 11.7308 113.146 11.5355C112.951 11.3403 112.951 11.0237 113.146 10.8284L116.328 7.64645Z" fill="white" fill-rule="evenodd"></path></svg><div class="webchat__keyboard-help__notes-pane"><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Mover entre mensagens</dt><dd class="webchat__keyboard-help__notes-text">Tecla de seta para cima</dd><dd class="webchat__keyboard-help__notes-text">Tecla de seta para baixo</dd></dl><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Acessar itens na mensagem</dt><dd class="webchat__keyboard-help__notes-text">Tecla Enter</dd></dl><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Mover entre itens em uma mensagem</dt><dd class="webchat__keyboard-help__notes-text">Tecla Tab</dd><dd class="webchat__keyboard-help__notes-text">Tecla Shift + tab</dd></dl><dl class="webchat__keyboard-help__notes"><dt class="webchat__keyboard-help__notes-header">Sair da mensagem</dt><dd class="webchat__keyboard-help__notes-text">Tecla Escape</dd></dl></div></div></article></div></div></div></div><div aria-label="Histórico de chat, use as teclas de seta para navegar." class="webchat__basic-transcript webchat--css-scuju-1orlmet webchat--css-scuju-1tdc372 webchat--css-scuju-1rr4qq7" dir="ltr" role="group" tabindex="0" aria-activedescendant="webchat__transcript-focus-rw4__activity-hwwpr"><div aria-live="polite" aria-roledescription="histórico de chat" class="webchat__live-region-transcript webchat--css-scuju-1je9q5d" role="log"></div><div tabindex="0"></div><div class="react-scroll-to-bottom--css-vmozn-1n7m0yu webchat__basic-transcript__scrollable"><div aria-hidden="true" class="webchat__basic-transcript__filler"></div><section aria-roledescription="histórico de chat" class="webchat--css-scuju-1l95nvm webchat__basic-transcript__transcript" role="feed"><article class="webchat__basic-transcript__activity webchat__basic-transcript__activity--read"><div aria-labelledby="webchat__basic-transcript__active-descendant-label--h9xly" class="webchat__basic-transcript__activity-active-descendant" id="webchat__transcript-focus-rw4__activity-h9xly" role="article"><div aria-hidden="true" class="webchat--css-scuju-111jw2m" id="webchat__basic-transcript__active-descendant-label--h9xly">O bot disse: Olá, posso apoiar no seu entendimento dos temas que são abordados pelas Comissões Temáticas no IBGC.</div></div><div tabindex="0"></div><div><div class="webchat__basic-transcript__activity-body"><div aria-labelledby="webchat__stacked-layout__id--wbvsm" class="webchat__stacked-layout webchat--css-scuju-rctxl4 webchat--css-scuju-18gwt0m webchat__stacked-layout--show-avatar webchat__stacked-layout--top-callout"><div class="webchat__stacked-layout__main"><div class="webchat__stacked-layout__avatar-gutter"><div aria-hidden="true" class="webchat__defaultAvatar webchat--css-scuju-1c6pw13 webchat--css-scuju-1ms7ti7"><div class="webchat__initialsAvatar webchat--css-scuju-1h0zvpv webchat--css-scuju-l3b7uo"><div class="webchat__initialsAvatar__initials"></div></div><div class="webchat__imageAvatar webchat--css-scuju-o7d8eg webchat--css-scuju-1wvn32q"><div class="webchat--css-scuju-17j40uk webchat__imageAvatar__image" style="height: 100%; width: 100%;"><img alt="" src="/Style%20Library/Images/robot.png"></div></div></div></div><div class="webchat__stacked-layout__content"><div aria-roledescription="message" class="webchat__stacked-layout__message-row" id="webchat__stacked-layout__id--wbvsm" role="group"><div class="webchat--css-scuju-111jw2m">O bot disse:</div><div class="webchat__bubble webchat__bubble--hide-nub webchat__bubble--nub-on-top webchat--css-scuju-1qo0vqe webchat--css-scuju-182a5e9 webchat__stacked-layout__message"><div class="webchat__bubble__nub-pad"></div><div class="webchat__bubble__content"><div class="webchat__text-content webchat__text-content--is-markdown webchat--css-scuju-1gi36dr"><div class="webchat__text-content__markdown webchat--css-scuju-kdgeig"><div xmlns="http://www.w3.org/1999/xhtml" class="webchat__render-markdown webchat__render-markdown--message-activity webchat--css-scuju-kdgeig"><p>Olá, posso apoiar no seu entendimento dos temas que são abordados pelas Comissões Temáticas no IBGC.</p></div>
+</div></div></div></div></div></div><div class="webchat__stacked-layout__alignment-pad"></div></div><div class="webchat__stacked-layout__status"><div class="webchat__stacked-layout__avatar-gutter"></div><div class="webchat__stacked-layout__nub-pad"></div><div class="webchat--css-scuju-111jw2m">Enviado às 13 de março 1:45 PM</div><div class="webchat__stacked-layout__alignment-pad"></div></div></div></div></div><div tabindex="0"></div><div class="webchat__basic-transcript__activity-indicator"></div></article><article class="webchat__basic-transcript__activity webchat__basic-transcript__activity--read"><div aria-labelledby="webchat__basic-transcript__active-descendant-label--hwwpr" class="webchat__basic-transcript__activity-active-descendant" id="webchat__transcript-focus-rw4__activity-hwwpr" role="article"><div aria-hidden="true" class="webchat--css-scuju-111jw2m" id="webchat__basic-transcript__active-descendant-label--hwwpr">O bot disse: Digite o tema sobre o qual você gostaria de saber, ou, se preferir, selecione um dos tópicos abaixo:</div></div><div tabindex="0"></div><div><div class="webchat__basic-transcript__activity-body"><div aria-labelledby="webchat__stacked-layout__id--yexz9" class="webchat__stacked-layout webchat--css-scuju-rctxl4 webchat--css-scuju-18gwt0m webchat__stacked-layout--hide-avatar webchat__stacked-layout--top-callout"><div class="webchat__stacked-layout__main"><div class="webchat__stacked-layout__avatar-gutter"></div><div class="webchat__stacked-layout__content"><div aria-roledescription="message" class="webchat__stacked-layout__message-row" id="webchat__stacked-layout__id--yexz9" role="group"><div class="webchat--css-scuju-111jw2m">O bot disse:</div><div class="webchat__bubble webchat__bubble--hide-nub webchat__bubble--nub-on-top webchat--css-scuju-1qo0vqe webchat--css-scuju-182a5e9 webchat__stacked-layout__message"><div class="webchat__bubble__nub-pad"></div><div class="webchat__bubble__content"><div class="webchat__text-content webchat__text-content--is-markdown webchat--css-scuju-1gi36dr"><div class="webchat__text-content__markdown webchat--css-scuju-kdgeig"><div xmlns="http://www.w3.org/1999/xhtml" class="webchat__render-markdown webchat__render-markdown--message-activity webchat--css-scuju-kdgeig"><p><strong>Digite o tema sobre o qual você gostaria de saber, ou, se preferir, selecione um dos tópicos abaixo</strong>:</p></div>
+</div></div></div></div></div></div><div class="webchat__stacked-layout__alignment-pad"></div></div><div class="webchat__stacked-layout__status"><div class="webchat__stacked-layout__avatar-gutter"></div><div class="webchat__stacked-layout__nub-pad"></div><span class="webchat__activity-status--slotted webchat__activity-status webchat--css-scuju-97vy13"><div class="webchat--css-scuju-111jw2m">Enviado às 13 de março 1:45 PM</div><span aria-hidden="true">há 17 minutos</span></span><div class="webchat__stacked-layout__alignment-pad"></div></div></div></div></div><div tabindex="0"></div><div class="webchat__basic-transcript__activity-indicator webchat__basic-transcript__activity-indicator--focus"></div></article></section></div><div tabindex="0"></div><div aria-labelledby="webchat__basic-transcript__terminator-label--1nryn" class="webchat__basic-transcript__terminator" role="note" tabindex="0"><div class="webchat__basic-transcript__terminator-body"><div class="webchat__basic-transcript__terminator-text" id="webchat__basic-transcript__terminator-label--1nryn">Término do histórico de chat</div></div></div><div class="webchat__basic-transcript__focus-indicator"></div></div><div class="webchat--css-scuju-111jw2m">Status da Conectividade: Conectado</div><div aria-invalid="false" class="webchat__send-box webchat--css-scuju-17dm1da webchat--css-scuju-1bfjcn2 webchat--css-scuju-6su6fj" dir="ltr" role="form"><div aria-label="Ações sugeridas" aria-live="polite" aria-orientation="vertical" class="webchat__suggested-actions webchat__suggested-actions--stacked-layout webchat--css-scuju-vtuthq webchat--css-scuju-1bwrjwc" role="toolbar"><div class="webchat__suggested-actions__stack"><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="0"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Atas de Reunião das Comissões</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Newsletters</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Tutoriais</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Projetos, artigos, publicações e outros entregáveis</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Outros assuntos</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Regulamento e Processo Seletivo</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div><div class="webchat__suggested-actions__item-box"><button aria-keyshortcuts="Alt+Shift+A" class="webchat__suggested-action webchat__suggested-action--wrapping webchat--css-scuju-12ui717 webchat--css-scuju-il3kxx webchat__suggested-actions__button" type="button" tabindex="-1"><span class="webchat__suggested-action__text webchat__suggested-actions__button-text-stacked-text-wrap">Avaliação Anual</span><div class="webchat__suggested-action__keyboard-focus-indicator"></div></button></div></div><div class="webchat__suggested-actions__focus-indicator"></div></div><div class="webchat__send-box__main"><form aria-disabled="false" class="webchat__send-box-text-box webchat--css-scuju-titn9n webchat--css-scuju-1ig1f67 webchat__send-box__text-box"><input class="webchat__send-box-text-box__input" placeholder="Digite sua mensagem" aria-label="Caixa de entrada de mensagens" data-id="webchat-sendbox-input" inputmode="text" type="text" value=""></form><button class="webchat--css-scuju-1r0ige7 webchat__icon-button webchat__icon-button--stretch webchat__send-button webchat__send-box__button webchat__send-box__button--align-stretch" title="Enviar" type="button"><div class="webchat__icon-button__shade"></div><svg class="webchat__send-icon webchat--css-scuju-varv44" height="28" viewBox="0 0 45.7 33.8" width="28"><path clip-rule="evenodd" d="M8.55 25.25l21.67-7.25H11zm2.41-9.47h19.26l-21.67-7.23zm-6 13l4-11.9L5 5l35.7 11.9z"></path></svg><div class="webchat__icon-button__keyboard-focus-indicator"></div></button></div></div></div><span class="webchat__submit-error-message webchat--css-scuju-1e9i5sl" id="webchat__send-box__error-message-id--wsawh" role="alert"></span></div></div>
+</div>
+
+  <script crossorigin="anonymous" src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+  <script>
+    
+      const atualURL = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasQRCode = urlParams.get("qrcode") === "true";
+
+    const ListaComissoes = {
+      "ConselhoAdministracao": "Conselho de Administração",
+      "DiretoriaEstatutaria": "Diretoria Estatutária",
+      "EstrategiaeInovacao": "Estratégia e Inovação",
+      "EticaGovernanca": "Ética e Integridade",
+      "EmpresasControleFamiliar": "Famílias Empresárias e Empresas Familiares",
+      "FinancasContabilidade": "Finanças, Fiscalização e Controles",
+      "GTConselhoFuturo": "Futuro da Governança",
+      "SecretariaGovernancaCorporativa": "Governance Officers",
+      "AcionistasInvestidores": "Investidores",
+      "Juridica": "Jurídica",
+      "ComunicacaoMercadoCapitais": "Mercado de Capitais",
+      "Pessoas": "Pessoas",
+      "GerenciamentoRiscosCorporativos": "Riscos Corporativos",
+      "Sustentabilidade": "Sustentabilidade e Clima"
+    };
+
+    let ComissaoUsuario = '';
+    for (const key in ListaComissoes) {
+      if (atualURL.includes(key)) {
+        ComissaoUsuario = ListaComissoes[key];
+        break;
+      }
+    }
+
+    (async function () {
+      const styleOptions = {
+        suggestedActionBackgroundColorOnHover: 'rgb(30, 71, 179)',
+        suggestedActionBackgroundColorOnFocus: 'rgb(30, 71, 179)',
+        suggestedActionBorderColor: '#1E47B3',
+        hideUploadButton: true,
+        suggestedActionLayout: 'stacked', // ou 'carousel'
+        suggestedActionHeight: '28px', // Reduz a altura dos botões
+        suggestedActionTextColor: 'Black',
+        suggestedActionTextColorOnHover: 'White',
+        suggestedActionTextColorOnFocus: 'White',
+        suggestedActionBorderRadius: '14px',
+        suggestedActionsStackedLayoutButtonTextWrap: true,
+        suggestedActionsStackedLayoutMaxHeight: 200, // Limita a altura total e ativa rolagem
+        bubbleMaxWidth: 360, // Garante que as mensagens não fiquem muito largas
+        rootHeight: '100%', // Garante que o WebChat ocupe todo o espaço disponível
+        botAvatarImage: '/Style%20Library/Images/robot.png',
+        fontSizeSmall: '50%',
+        botAvatarInitials: '',
+        bubbleFromUserBackground: '#1E47B3',
+        bubbleFromUserBorderColor: '#1E47B3',
+        bubbleFromUserTextColor: 'White',
+      };
+
+      const tokenEndpointURL = 'https://ed51e77db4a34cc6a0c990b1f72ab2.e7.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cra86_agent/directline/token?api-version=2022-03-01-preview';
+      const locale = document.documentElement.lang || 'pt-BR';
+      const apiVersion = '2022-03-01-preview';
+
+      const statusInfo = (msg) => {
+        console.log(msg);
+        const webchatElem = document.getElementById('webchat');
+        if (webchatElem) {
+          webchatElem.setAttribute('data-webchat-status', msg);
+        }
+      };
+
+      const showChatContainer = () => {
+        const webchatElem = document.getElementById('webchat');
+        if (webchatElem) {
+          webchatElem.style.visibility = 'visible';
+          webchatElem.style.opacity = '1';
+        }
+      };
+
+      const hideChatContainer = () => {
+        const webchatElem = document.getElementById('webchat');
+        if (webchatElem) {
+          webchatElem.style.visibility = 'hidden';
+          webchatElem.style.opacity = '0';
+        }
+      };
+
+      hideChatContainer();
+
+      const throwIfNotOK = async (response, name) => {
+        if (!response.ok) {
+          const text = await response.text().catch(() => 'no body');
+          throw new Error(`${name} failed (${response.status} ${response.statusText}): ${text}`);
+        }
+        return response;
+      };
+
+      let directLineURL = 'https://directline.botframework.com';
+      try {
+        const channelSettings = await fetch(`https://ed51e77db4a34cc6a0c990b1f72ab2.e7.environment.api.powerplatform.com/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`)
+          .then(r => throwIfNotOK(r, 'regionalchannelsettings'))
+          .then(r => r.json());
+
+        if (channelSettings?.channelUrlsById?.directline) {
+          directLineURL = channelSettings.channelUrlsById.directline;
+        } else {
+          console.warn('regionalchannelsettings retornou sem directline, usando directline.botframework.com');
+        }
+      } catch (err) {
+        console.warn('Erro em regionalchannelsettings, usando fallback directline.botframework.com', err);
+      }
+
+      const tokenData = await fetch(tokenEndpointURL, { method: 'GET' })
+        .then(r => throwIfNotOK(r, 'directline token endpoint GET'))
+        .then(r => r.json())
+        .catch(async (err) => {
+          console.warn('GET token endpoint falhou, tentando POST', err);
+          return fetch(tokenEndpointURL, { method: 'POST' })
+            .then(r => throwIfNotOK(r, 'directline token endpoint POST'))
+            .then(r => r.json());
+        });
+
+      const token = tokenData?.token || tokenData?.Token;
+      if (!token) {
+        throw new Error('Token não retornado pelo endpoint de DirectLine. Verificar o canal e a URL.');
+      }
+
+      statusInfo('Token DirectLine obtido. Criando DirectLine...');
+
+      const directLine = WebChat.createDirectLine({
+        domain: `${new URL('v3/directline', directLineURL)}`,
+        token
+      });
+
+      const subscription = directLine.connectionStatus$.subscribe({
+        next(value) {
+          statusInfo(`DirectLine status: ${value}`);
+          if (value === 2) {
+            showChatContainer();
+            directLine.postActivity({
+              localTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              locale,
+              name: 'startConversation',
+              type: 'event',
+              value: {
+                Comissao: ComissaoUsuario,
+                qrcode: hasQRCode
+              }
+            }).subscribe();
+            subscription.unsubscribe();
+          }
+        }
+      });
+
+      WebChat.renderWebChat({ directLine, locale, styleOptions }, document.getElementById('webchat'));
+      statusInfo('WebChat renderizado, aguardando conexão...');
+    })();
+    console.log(hasQRCode)
+    console.log(ComissaoUsuario)
+    document.getElementById("openPopupIcon").addEventListener("click", () => {
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("headerMinimizeBtn").style.display = "block";
+      document.getElementById("headerCloseBtn").style.display = "block";
+      document.querySelector('.triangle').classList.remove('open');
+      document.querySelector('.message').classList.remove('open');
+      document.querySelector('.ChatCloseButton').classList.remove('open');
+    });
+
+    document.getElementById("headerMinimizeBtn").addEventListener("click", () => {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("headerMinimizeBtn").style.display = "none";
+      document.getElementById("headerCloseBtn").style.display = "none";
+      // Show initial tooltip again
+      setTimeout(() => {
+        document.querySelector('.triangle').classList.add('open');
+        document.querySelector('.message').classList.add('open');
+        document.querySelector('.ChatCloseButton').classList.add('open');
+      }, 300);
+    });
+
+    document.getElementById("headerCloseBtn").addEventListener("click", () => {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("headerMinimizeBtn").style.display = "none";
+      document.getElementById("headerCloseBtn").style.display = "none";
+      // Reset to initial state
+      setTimeout(() => {
+        document.querySelector('.triangle').classList.add('open');
+        document.querySelector('.message').classList.add('open');
+        document.querySelector('.ChatCloseButton').classList.add('open');
+      }, 300);
+    });
+
+    document.querySelector('.ChatCloseButton').addEventListener('click', () => {
+      document.querySelector('.triangle').classList.remove('open');
+      document.querySelector('.message').classList.remove('open');
+      document.querySelector('.ChatCloseButton').classList.remove('open');
+    });
+
+    window.addEventListener('load', () => {
+      // Começa fechado no load e exibe apenas o ícone de abrir.
+      document.getElementById('popup').style.display = 'none';
+      document.getElementById('headerMinimizeBtn').style.display = 'none';
+      document.getElementById('headerCloseBtn').style.display = 'none';
+      document.querySelector('.triangle').classList.add('open');
+      document.querySelector('.message').classList.add('open');
+      document.querySelector('.ChatCloseButton').classList.add('open');
+    });
+  </script>
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;9ca859e23874482c94af4474146aec8d&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+
+</div>
+	</div>

@@ -193,6 +193,7 @@
   <div id="webchat" role="main"></div>
   </div>
 
+  <script src="config.js"></script>
   <script crossorigin="anonymous" src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
   <script>
     
@@ -241,7 +242,7 @@
         suggestedActionsStackedLayoutMaxHeight: 200, // Limita a altura total e ativa rolagem
         bubbleMaxWidth: 360, // Garante que as mensagens não fiquem muito largas
         rootHeight: '100%', // Garante que o WebChat ocupe todo o espaço disponível
-        botAvatarImage: '/Style%20Library/Images/robot.png',
+        botAvatarImage: CONFIG.BOT_AVATAR_URL,
         fontSizeSmall: '50%',
         botAvatarInitials: '',
         bubbleFromUserBackground: '#1E47B3',
@@ -249,9 +250,9 @@
         bubbleFromUserTextColor: 'White',
       };
 
-      const tokenEndpointURL = 'https://ed51e77db4a34cc6a0c990b1f72ab2.e7.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cra86_agent/directline/token?api-version=2022-03-01-preview';
+      const tokenEndpointURL = CONFIG.TOKEN_ENDPOINT_URL;
       const locale = document.documentElement.lang || 'pt-BR';
-      const apiVersion = '2022-03-01-preview';
+      const apiVersion = CONFIG.API_VERSION;
 
       const showChatContainer = () => {
         const webchatElem = document.getElementById('webchat');
@@ -279,16 +280,16 @@
         return response;
       };
 
-      let directLineURL = 'https://directline.botframework.com';
+      let directLineURL = CONFIG.DIRECTLINE_URL;
       try {
-        const channelSettings = await fetch(`https://ed51e77db4a34cc6a0c990b1f72ab2.e7.environment.api.powerplatform.com/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`)
+        const channelSettings = await fetch(`${CONFIG.CHANNEL_SETTINGS_URL}?api-version=${apiVersion}`)
           .then(r => throwIfNotOK(r, 'regionalchannelsettings'))
           .then(r => r.json());
 
         if (channelSettings?.channelUrlsById?.directline) {
           directLineURL = channelSettings.channelUrlsById.directline;
         } else {
-          console.warn('regionalchannelsettings retornou sem directline, usando directline.botframework.com');
+          console.warn('regionalchannelsettings retornou sem directline, usando CONFIG.DIRECTLINE_URL');
         }
       } catch (err) {
         console.warn('Erro em regionalchannelsettings, usando fallback directline.botframework.com', err);
